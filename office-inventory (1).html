@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>คลังอุปกรณ์สำนักงาน</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b0b0c;--surface:#141416;--gold:#d9af42;--gold-bright:#f4cf67;--text:#f4f0e6;--muted:#a29d91}
+*{box-sizing:border-box}
+html{background:var(--ink)}
+body{margin:0;width:100%;min-height:100%;background:var(--ink);color:var(--text);font-family:"IBM Plex Sans Thai",Tahoma,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(244,207,103,.7);outline-offset:3px}
+.app-shell{width:100%;min-height:100vh;background:radial-gradient(circle at 75% 0%,rgba(217,175,66,.09),transparent 28%),#0b0b0c}
+.sidebar{width:272px;background:rgba(20,20,22,.92);border-right:1px solid rgba(217,175,66,.18)}
+.brand-mark{width:42px;height:42px;display:grid;place-items:center;background:#d9af42;color:#101010;font-weight:700;border-radius:13px;box-shadow:0 0 24px rgba(217,175,66,.2)}
+.nav-item{color:var(--muted);border:1px solid transparent;transition:.2s ease;background:transparent}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{color:var(--gold-bright);background:rgba(217,175,66,.1);border-color:rgba(217,175,66,.22)}
+.nav-item.active span{color:var(--gold-bright)!important}
+.nav-icon{width:19px;height:19px}
+.surface{background:rgba(20,20,22,.9);border:1px solid rgba(217,175,66,.15)}
+.surface-soft{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.075)}
+.stat-card{min-height:154px;position:relative;overflow:hidden}
+.stat-card::after{content:"";position:absolute;width:90px;height:90px;right:-25px;bottom:-35px;border-radius:50%;border:1px solid rgba(217,175,66,.14)}
+.gold-text{color:var(--gold-bright)}
+.muted{color:var(--muted)}
+.primary-btn{background:#d9af42;color:#15120a;font-weight:700;border:1px solid #d9af42;transition:.2s ease}
+.primary-btn:hover{background:#f4cf67;box-shadow:0 0 20px rgba(217,175,66,.18);transform:translateY(-1px)}
+.secondary-btn{border:1px solid rgba(217,175,66,.42);color:var(--gold-bright);background:transparent;transition:.2s ease}
+.secondary-btn:hover{background:rgba(217,175,66,.1)}
+.secondary-btn:disabled{opacity:.4;cursor:not-allowed}
+.danger-btn{color:#ffabab;border:1px solid rgba(255,119,119,.35);background:rgba(255,119,119,.08)}
+.danger-btn:hover{background:rgba(255,119,119,.16)}
+.status{display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;border-radius:999px;padding:.28rem .62rem;font-size:.74rem;font-weight:600}
+.status-ready{background:rgba(154,214,154,.12);color:#b9ebb9;border:1px solid rgba(154,214,154,.23)}
+.status-low{background:rgba(243,191,78,.11);color:#ffd578;border:1px solid rgba(243,191,78,.24)}
+.status-out,.status-rejected{background:rgba(255,119,119,.11);color:#ffabab;border:1px solid rgba(255,119,119,.25)}
+.status-pending{background:rgba(217,175,66,.12);color:#f4cf67;border:1px solid rgba(217,175,66,.26)}
+.progress-track{height:6px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;border-radius:999px;background:var(--gold)}
+.data-table th{color:#aaa394;text-transform:uppercase;font-size:.7rem;letter-spacing:.07em;font-weight:600}
+.data-table tbody tr{border-top:1px solid rgba(255,255,255,.06);transition:.16s ease}
+.data-table tbody tr:hover{background:rgba(217,175,66,.055)}
+.thumb{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#2a2927;border:1px solid rgba(217,175,66,.2);overflow:hidden;font-size:1.2rem}
+.field{width:100%;background:#0f0f11;border:1px solid rgba(255,255,255,.13);color:var(--text);border-radius:11px;padding:.68rem .78rem}
+.field::placeholder{color:#706c63}
+.field:focus{border-color:rgba(244,207,103,.75);outline:none;box-shadow:0 0 0 3px rgba(217,175,66,.1)}
+.modal-backdrop{background:rgba(0,0,0,.68);backdrop-filter:blur(6px)}
+.modal-panel{width:min(94vw,560px);max-height:88vh;overflow:auto;background:#171719;border:1px solid rgba(217,175,66,.4);box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.toast{transform:translateY(24px);opacity:0;transition:.25s ease;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.view{display:none}
+.view.active{display:block;animation:enter .25s ease both}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bottom-nav{background:rgba(24,24,27,.9);backdrop-filter:blur(14px);border-top:1px solid rgba(217,175,66,.18);padding-bottom:calc(.5rem + env(safe-area-inset-bottom,0px))}
+.bottom-nav button{background:transparent;border:0}
+.bottom-nav button.active{color:var(--gold-bright)}
+.modal-hidden{display:none!important}
+.error-text{color:#ffabab;font-size:.78rem;min-height:1.15rem;display:block;margin-top:.25rem}
+@media(max-width:900px){.sidebar{display:none}.main-area{padding-bottom:96px}.desktop-only{display:none!important}}
+@media(min-width:901px){.mobile-only{display:none!important}.main-area{margin-left:272px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+ <aside class="sidebar fixed inset-y-0 left-0 z-30 flex flex-col p-4" aria-label="เมนูหลัก">
+  <div class="flex items-center gap-3 px-2 py-3 mb-6">
+   <div class="brand-mark" aria-hidden="true">S</div>
+   <div>
+    <h1 class="text-base font-bold leading-tight" style="font-size:26px">คลังอุปกรณ์</h1>
+    <p class="text-xs muted mt-1" style="letter-spacing:.08rem">OFFICE INVENTORY</p>
+   </div>
+  </div>
+  <nav class="space-y-2" aria-label="เมนูแอป">
+   <button type="button" data-view="dashboard" class="nav-item active w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>ภาพรวม</span></button>
+   <button type="button" data-view="inventory" class="nav-item w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left"><i data-lucide="boxes" class="nav-icon"></i><span>คลังอุปกรณ์</span></button>
+   <button type="button" data-view="requests" class="nav-item w-full flex items-center justify-between rounded-xl px-3 py-3 text-left"><span class="flex items-center gap-3"><i data-lucide="clipboard-list" class="nav-icon"></i><span>คำขอเบิก</span></span><span id="pendingBadge" class="hidden min-w-5 rounded-full bg-[#d9af42] px-1.5 py-0.5 text-center text-xs font-bold text-[#16130b]">0</span></button>
+  </nav>
+  <div class="mt-auto surface-soft rounded-2xl p-3">
+   <p class="text-xs muted mb-2">เลือกมุมมองการใช้งาน</p>
+   <div class="grid grid-cols-2 gap-1 rounded-xl bg-black/30 p-1" role="group" aria-label="สลับบทบาท">
+    <button id="employeeRoleBtn" type="button" class="rounded-lg px-2 py-2 text-xs font-semibold"></button>
+    <button id="hrRoleBtn" type="button" class="rounded-lg px-2 py-2 text-xs font-semibold"></button>
+   </div>
+   <p id="roleHint" class="mt-2 text-xs muted"></p>
+  </div>
+ </aside>
+
+ <main class="main-area min-h-screen px-4 py-5 sm:px-7 sm:py-7" style="padding-top:calc(1.25rem + env(safe-area-inset-top,0px))">
+  <!-- Mobile role switch -->
+  <div class="mobile-only mb-5 flex items-center justify-between gap-3">
+   <div class="flex items-center gap-2"><div class="brand-mark" style="width:34px;height:34px;border-radius:10px">S</div><b>คลังอุปกรณ์</b></div>
+   <div class="grid grid-cols-2 gap-1 rounded-xl bg-black/30 p-1">
+    <button id="employeeRoleBtnM" type="button" class="rounded-lg px-3 py-1.5 text-xs font-semibold"></button>
+    <button id="hrRoleBtnM" type="button" class="rounded-lg px-3 py-1.5 text-xs font-semibold"></button>
+   </div>
+  </div>
+
+  <section id="dashboardView" class="view active" aria-labelledby="dashboard-title">
+   <header class="mb-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+     <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-[#9ad69a] shadow-[0_0_10px_rgba(154,214,154,.6)]"></span><span class="text-xs muted">บันทึกข้อมูลในเบราว์เซอร์แล้ว</span></div>
+     <h2 id="dashboard-title" class="mt-3 text-2xl font-bold sm:text-3xl">ภาพรวมคลังอุปกรณ์</h2>
+     <p class="mt-2 muted">ติดตามสต๊อกและคำขอเบิกได้ในที่เดียว</p>
+    </div>
+    <button id="requestFromDashboard" type="button" class="primary-btn inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3"><i data-lucide="plus" class="h-5 w-5"></i><span>ขอเบิกอุปกรณ์</span></button>
+   </header>
+   <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <article class="surface stat-card rounded-2xl p-5">
+     <div class="flex items-start justify-between"><span class="text-sm muted">รายการในคลัง</span><i data-lucide="package" class="h-5 w-5 gold-text"></i></div>
+     <p id="statTotal" class="mt-5 text-4xl font-bold gold-text" aria-live="polite">0</p>
+     <p id="statTotalDetail" class="mt-2 text-xs muted"></p>
+    </article>
+    <article class="surface stat-card rounded-2xl p-5">
+     <div class="flex items-start justify-between"><span class="text-sm muted">รายการใกล้หมด</span><i data-lucide="triangle-alert" class="h-5 w-5 text-[#f3bf4e]"></i></div>
+     <p id="statLow" class="mt-5 text-4xl font-bold text-[#f3bf4e]" aria-live="polite">0</p>
+     <p class="mt-2 text-xs muted">ควรตรวจสอบและรับสินค้าเพิ่ม</p>
+    </article>
+    <article class="surface stat-card rounded-2xl p-5">
+     <div class="flex items-start justify-between"><span class="text-sm muted">รายการหมด</span><i data-lucide="circle-x" class="h-5 w-5 text-[#ff7777]"></i></div>
+     <p id="statOut" class="mt-5 text-4xl font-bold text-[#ff7777]" aria-live="polite">0</p>
+     <p class="mt-2 text-xs muted">ต้องดำเนินการรับสินค้า</p>
+    </article>
+    <article class="surface stat-card rounded-2xl p-5">
+     <div class="flex items-start justify-between"><span class="text-sm muted">คำขอรออนุมัติ</span><i data-lucide="clock-3" class="h-5 w-5 gold-text"></i></div>
+     <p id="statPending" class="mt-5 text-4xl font-bold gold-text" aria-live="polite">0</p>
+     <p class="mt-2 text-xs muted">รอการตัดสินใจจาก HR</p>
+    </article>
+   </div>
+   <div class="mt-6 grid gap-6 xl:grid-cols-5">
+    <section class="surface rounded-2xl p-5 xl:col-span-3" aria-labelledby="attention-title">
+     <div class="mb-4 flex items-center justify-between">
+      <div><h3 id="attention-title" class="font-bold" style="font-size:18px">ต้องให้ความสนใจ</h3><p class="mt-1 text-xs muted">รายการที่ใกล้หมดหรือหมดแล้ว</p></div>
+      <button type="button" data-view="inventory" class="gold-text text-sm font-semibold" style="background:none;border:0">ดูคลังทั้งหมด</button>
+     </div>
+     <div id="attentionList" class="space-y-3"></div>
+     <div id="attentionEmpty" class="hidden rounded-xl border border-dashed border-white/10 py-9 text-center text-sm muted"></div>
+    </section>
+    <section class="surface rounded-2xl p-5 xl:col-span-2" aria-labelledby="recent-title">
+     <div class="mb-4"><h3 id="recent-title" class="font-bold" style="font-size:18px">คำขอล่าสุด</h3><p class="mt-1 text-xs muted">อัปเดตจากกิจกรรมล่าสุด</p></div>
+     <div id="recentRequests" class="space-y-3"></div>
+     <div id="recentEmpty" class="hidden rounded-xl border border-dashed border-white/10 py-9 text-center text-sm muted"></div>
+    </section>
+   </div>
+  </section>
+
+  <section id="inventoryView" class="view" aria-labelledby="inventory-title">
+   <header class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+     <p class="text-xs font-semibold uppercase tracking-[.14em] gold-text">Stock control</p>
+     <h2 id="inventory-title" class="mt-2 text-2xl font-bold">คลังอุปกรณ์</h2>
+     <p class="mt-1 muted">ค้นหา ตรวจสอบ และจัดการยอดคงเหลือ</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+     <button type="button" class="exportBtn secondary-btn hidden inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm"><i data-lucide="table-2" class="h-4 w-4"></i>ส่งออกไป Google Sheets</button>
+     <button id="addItemBtn" type="button" class="primary-btn hidden rounded-xl px-4 py-2.5 text-sm">+ เพิ่มอุปกรณ์</button>
+    </div>
+   </header>
+   <div class="surface rounded-2xl p-4 sm:p-5">
+    <div class="mb-5 flex flex-col gap-3 md:flex-row">
+     <label class="relative flex-1"><span class="sr-only">ค้นหาอุปกรณ์</span><i data-lucide="search" class="absolute left-3 top-3.5 h-4 w-4 muted"></i><input id="searchInput" class="field pl-10" type="search" placeholder="ค้นหาชื่ออุปกรณ์หรือหมวดหมู่"></label>
+     <label class="md:w-56"><span class="sr-only">กรองหมวดหมู่</span><select id="categoryFilter" class="field"><option value="">ทุกหมวดหมู่</option></select></label>
+    </div>
+    <div class="overflow-x-auto">
+     <table class="data-table min-w-[800px] w-full text-sm">
+      <thead><tr class="text-left"><th class="pb-3">อุปกรณ์</th><th class="pb-3">หมวดหมู่</th><th class="pb-3">คงเหลือ</th><th class="pb-3">สถานะ</th><th class="pb-3">ระดับสต๊อก</th><th class="pb-3 text-right">จัดการ</th></tr></thead>
+      <tbody id="inventoryTableBody"></tbody>
+     </table>
+    </div>
+    <div id="inventoryEmpty" class="hidden py-12 text-center"><i data-lucide="package-search" class="mx-auto h-8 w-8 muted"></i><p class="mt-3 muted">ไม่พบอุปกรณ์ที่ตรงกับการค้นหา</p></div>
+   </div>
+  </section>
+
+  <section id="requestsView" class="view" aria-labelledby="requests-title">
+   <header class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div>
+     <p class="text-xs font-semibold uppercase tracking-[.14em] gold-text">Request center</p>
+     <h2 id="requests-title" class="mt-2 text-2xl font-bold">คำขอเบิก</h2>
+     <p id="requestIntro" class="mt-1 muted">ติดตามสถานะคำขอเบิกของคุณ</p>
+    </div>
+    <div class="flex flex-wrap gap-2"><button type="button" class="exportBtn secondary-btn hidden inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm"><i data-lucide="table-2" class="h-4 w-4"></i>ส่งออกไป Google Sheets</button><button id="requestFromRequests" type="button" class="primary-btn rounded-xl px-4 py-2.5 text-sm">+ ส่งคำขอเบิก</button></div>
+   </header>
+   <div class="surface overflow-hidden rounded-2xl">
+    <div class="overflow-x-auto">
+     <table class="data-table min-w-[820px] w-full text-sm">
+      <thead class="bg-white/[.025]"><tr class="text-left"><th class="p-4">วันที่</th><th class="p-4">ผู้เบิก</th><th class="p-4">อุปกรณ์</th><th class="p-4">จำนวน</th><th class="p-4">เหตุผล</th><th class="p-4">สถานะ</th><th class="p-4 text-right">ดำเนินการ</th></tr></thead>
+      <tbody id="requestsTableBody"></tbody>
+     </table>
+    </div>
+    <div id="requestsEmpty" class="hidden py-14 text-center"><i data-lucide="clipboard-x" class="mx-auto h-9 w-9 muted"></i><p class="mt-3 muted">ยังไม่มีคำขอเบิกในรายการนี้</p></div>
+   </div>
+  </section>
+ </main>
+
+ <nav class="bottom-nav mobile-only fixed bottom-0 left-0 right-0 z-40 grid grid-cols-3 px-2 pt-2" aria-label="เมนูมือถือ">
+  <button type="button" data-view="dashboard" class="active flex flex-col items-center gap-1 rounded-lg py-1.5 text-xs muted"><i data-lucide="layout-dashboard" class="h-5 w-5"></i><span>ภาพรวม</span></button>
+  <button type="button" data-view="inventory" class="flex flex-col items-center gap-1 rounded-lg py-1.5 text-xs muted"><i data-lucide="boxes" class="h-5 w-5"></i><span>คลัง</span></button>
+  <button type="button" data-view="requests" class="flex flex-col items-center gap-1 rounded-lg py-1.5 text-xs muted"><i data-lucide="clipboard-list" class="h-5 w-5"></i><span>คำขอ</span></button>
+ </nav>
+</div>
+
+<div id="modalRoot" class="modal-hidden fixed inset-0 z-50 grid place-items-center p-4 modal-backdrop" role="presentation">
+ <section id="modalPanel" class="modal-panel rounded-2xl p-5 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="mb-5 flex items-start justify-between gap-4">
+   <div><p id="modalKicker" class="text-xs font-semibold uppercase tracking-[.13em] gold-text"></p><h2 id="modalTitle" class="mt-1 text-xl font-bold"></h2></div>
+   <button id="closeModalBtn" type="button" class="rounded-lg p-2 muted hover:bg-white/5 hover:text-white" style="background:none;border:0" aria-label="ปิดหน้าต่าง"><i data-lucide="x" class="h-5 w-5"></i></button>
+  </div>
+  <div id="modalContent"></div>
+ </section>
+</div>
+
+<div id="toast" class="toast fixed bottom-24 right-5 z-[60] flex max-w-[calc(100vw-2.5rem)] items-center gap-3 rounded-xl border border-[#d9af4266] bg-[#1e1d19] px-4 py-3 text-sm shadow-2xl" role="status" aria-live="polite">
+ <i id="toastIcon" data-lucide="check-circle-2" class="h-5 w-5 gold-text"></i><span id="toastMessage"></span>
+</div>
+
+<template id="requestFormTemplate">
+ <form id="requestForm" novalidate>
+  <div class="space-y-4">
+   <div><label for="requesterName" class="mb-1.5 block text-sm font-medium">ชื่อผู้เบิก</label><input id="requesterName" class="field" type="text" maxlength="80" placeholder="ระบุชื่อของคุณ"><span id="requesterNameError" class="error-text"></span></div>
+   <div><label for="requestItem" class="mb-1.5 block text-sm font-medium">อุปกรณ์ที่ต้องการเบิก</label><select id="requestItem" class="field"></select><span id="requestItemError" class="error-text"></span></div>
+   <div><label for="requestQty" class="mb-1.5 block text-sm font-medium">จำนวนที่ต้องการ</label><input id="requestQty" class="field" type="number" min="1" step="1" placeholder="เช่น 2"><span id="requestQtyError" class="error-text"></span></div>
+   <div><label for="requestReason" class="mb-1.5 block text-sm font-medium">เหตุผลในการเบิก</label><textarea id="requestReason" class="field min-h-24 resize-y" maxlength="240" placeholder="บอกวัตถุประสงค์โดยย่อ"></textarea><span id="requestReasonError" class="error-text"></span></div>
+  </div>
+  <div class="mt-6 flex justify-end gap-3"><button type="button" class="modalCancel secondary-btn rounded-xl px-4 py-2.5 text-sm">ยกเลิก</button><button type="submit" class="primary-btn rounded-xl px-4 py-2.5 text-sm">ส่งคำขอเบิก</button></div>
+ </form>
+</template>
+
+<script>
+const STORAGE_KEY="office-stock-gold-v1";
+const defaultState={
+ items:[
+  {id:"a4",name:"กระดาษ A4",category:"เครื่องเขียน",qty:12,unit:"รีม",min:10,icon:"📄"},
+  {id:"pen",name:"ปากกาลูกลื่น",category:"เครื่องเขียน",qty:8,unit:"ด้าม",min:12,icon:"🖊️"},
+  {id:"folder",name:"แฟ้มสันกว้าง",category:"เครื่องเขียน",qty:18,unit:"เล่ม",min:8,icon:"🗂️"},
+  {id:"ink",name:"หมึกพิมพ์",category:"อุปกรณ์พิมพ์",qty:0,unit:"ตลับ",min:3,icon:"🖨️"},
+  {id:"mouse",name:"เมาส์",category:"อุปกรณ์ไอที",qty:4,unit:"ชิ้น",min:4,icon:"🖱️"},
+  {id:"keyboard",name:"คีย์บอร์ด",category:"อุปกรณ์ไอที",qty:7,unit:"ชิ้น",min:3,icon:"⌨️"},
+  {id:"coffee",name:"กาแฟซอง",category:"ของใช้ส่วนกลาง",qty:5,unit:"กล่อง",min:6,icon:"☕"}
+ ],
+ requests:[],pin:"",failedAttempts:0,lockedUntil:0,lastRequester:""
+};
+let state=loadState(),role="employee",editingItemId=null,toastTimer;
+
+function loadState(){
+ try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));return saved?{...defaultState,...saved}:structuredClone(defaultState);}
+ catch{return structuredClone(defaultState);}
+}
+function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){console.warn("storage unavailable",e);}}
+function escapeHTML(v){const el=document.createElement("div");el.textContent=v??"";return el.innerHTML;}
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function formatDate(iso){return new Intl.DateTimeFormat("th-TH",{day:"numeric",month:"short",year:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(iso));}
+function itemStatus(i){return i.qty<=0?"out":i.qty<=i.min?"low":"ready";}
+function statusHTML(s){
+ const map={ready:["status-ready","พร้อมใช้"],low:["status-low","ใกล้หมด"],out:["status-out","หมด"],pending:["status-pending","รออนุมัติ"],approved:["status-ready","อนุมัติแล้ว"],rejected:["status-rejected","ไม่อนุมัติ"]};
+ return `<span class="status ${map[s][0]}"><span class="h-1.5 w-1.5 rounded-full bg-current"></span>${map[s][1]}</span>`;
+}
+function itemById(id){return state.items.find(i=>i.id===id);}
+function saveAndRender(msg,type="success"){persist();renderAll();if(msg)showToast(msg,type);}
+function showToast(message,type="success"){
+ const toast=document.getElementById("toast"),icon=document.getElementById("toastIcon");
+ document.getElementById("toastMessage").textContent=message;
+ icon.setAttribute("data-lucide",type==="error"?"circle-x":type==="warning"?"triangle-alert":"check-circle-2");
+ lucide.createIcons();toast.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove("show"),3200);
+}
+function thumb(i){return `<div class="thumb" aria-hidden="true">${escapeHTML(i.icon||"📦")}</div>`;}
+
+function renderAll(){renderRole();renderStats();renderAttention();renderRecent();renderInventory();renderRequests();updatePendingBadge();lucide.createIcons();}
+function renderRole(){
+ const isHR=role==="hr";
+ [["employeeRoleBtn","พนักงาน",false],["hrRoleBtn","HR",true],["employeeRoleBtnM","พนักงาน",false],["hrRoleBtnM","HR",true]].forEach(([id,label,hr])=>{
+  const b=document.getElementById(id);b.textContent=label;
+  b.className=b.className.replace(/\bbg-\[#d9af42\]|\btext-\[#14120b\]|\btext-\[#a29d91\]/g,"").trim()+" "+(hr===isHR?"bg-[#d9af42] text-[#14120b]":"text-[#a29d91]");
+  b.style.background=hr===isHR?"#d9af42":"transparent";b.style.border="0";b.style.color=hr===isHR?"#14120b":"#a29d91";
+ });
+ document.getElementById("roleHint").textContent=isHR?"โหมดผู้ดูแลคลัง":"โหมดส่งคำขอเบิก";
+ document.getElementById("addItemBtn").classList.toggle("hidden",!isHR);
+ document.querySelectorAll(".exportBtn").forEach(b=>b.classList.toggle("hidden",!isHR));
+ document.getElementById("requestFromDashboard").classList.toggle("hidden",isHR);
+ document.getElementById("requestFromRequests").classList.toggle("hidden",isHR);
+ document.getElementById("requestIntro").textContent=isHR?"ตรวจสอบและตัดสินใจคำขอเบิกของพนักงาน":"แสดงเฉพาะคำขอที่ส่งด้วยชื่อของคุณ";
+}
+function renderStats(){
+ const low=state.items.filter(i=>itemStatus(i)==="low").length,out=state.items.filter(i=>itemStatus(i)==="out").length,pending=state.requests.filter(r=>r.status==="pending").length;
+ document.getElementById("statTotal").textContent=state.items.length;
+ document.getElementById("statTotalDetail").textContent=`${state.items.reduce((s,i)=>s+i.qty,0)} หน่วยคงเหลือรวม`;
+ document.getElementById("statLow").textContent=low;
+ document.getElementById("statOut").textContent=out;
+ document.getElementById("statPending").textContent=pending;
+}
+function renderAttention(){
+ const list=state.items.filter(i=>itemStatus(i)!=="ready").sort((a,b)=>a.qty-b.qty);
+ const root=document.getElementById("attentionList"),empty=document.getElementById("attentionEmpty");
+ root.innerHTML=list.slice(0,5).map(i=>`<div class="surface-soft flex items-center gap-3 rounded-xl p-3">${thumb(i)}<div class="min-w-0 flex-1"><p class="truncate font-semibold">${escapeHTML(i.name)}</p><p class="mt-1 text-xs muted">เหลือ ${i.qty} ${escapeHTML(i.unit)} · ขั้นต่ำ ${i.min}</p></div>${statusHTML(itemStatus(i))}</div>`).join("");
+ empty.textContent="ยอดคงเหลือของทุกอุปกรณ์อยู่ในระดับพร้อมใช้";empty.classList.toggle("hidden",list.length>0);
+}
+function renderRecent(){
+ const records=[...state.requests].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,4);
+ const root=document.getElementById("recentRequests"),empty=document.getElementById("recentEmpty");
+ root.innerHTML=records.map(r=>{const item=itemById(r.itemId);return `<div class="border-b border-white/5 pb-3 last:border-0 last:pb-0"><div class="flex items-start justify-between gap-3"><p class="font-medium">${escapeHTML(item?.name||r.itemName)}</p>${statusHTML(r.status)}</div><p class="mt-1 text-xs muted">${escapeHTML(r.requester)} · ${r.qty} ${escapeHTML(item?.unit||"รายการ")}</p></div>`}).join("");
+ empty.textContent="ยังไม่มีคำขอเบิกในระบบ";empty.classList.toggle("hidden",records.length>0);
+}
+function renderInventory(){
+ const keyword=document.getElementById("searchInput").value.toLowerCase().trim(),cat=document.getElementById("categoryFilter").value;
+ const categories=[...new Set(state.items.map(i=>i.category))];
+ document.getElementById("categoryFilter").innerHTML=`<option value="">ทุกหมวดหมู่</option>${categories.map(c=>`<option ${c===cat?"selected":""} value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("")}`;
+ const items=state.items.filter(i=>(!keyword||`${i.name} ${i.category}`.toLowerCase().includes(keyword))&&(!cat||i.category===cat));
+ document.getElementById("inventoryTableBody").innerHTML=items.map(i=>{
+  const s=itemStatus(i),ratio=Math.min(100,Math.round(i.qty/Math.max(i.min*2,1)*100));
+  return `<tr><td class="p-4"><div class="flex items-center gap-3">${thumb(i)}<div><p class="font-semibold">${escapeHTML(i.name)}</p><p class="text-xs muted">ขั้นต่ำ ${i.min} ${escapeHTML(i.unit)}</p></div></div></td><td class="p-4 muted">${escapeHTML(i.category)}</td><td class="p-4"><b class="${s==="out"?"text-[#ffabab]":s==="low"?"text-[#ffd578]":"text-white"}">${i.qty}</b> <span class="muted">${escapeHTML(i.unit)}</span></td><td class="p-4">${statusHTML(s)}</td><td class="p-4"><div class="w-28"><div class="progress-track"><div class="progress-fill" style="width:${ratio}%;background:${s==="out"?"#ff7777":s==="low"?"#f3bf4e":"#d9af42"}"></div></div></div></td><td class="p-4 text-right">${role==="hr"?`<button onclick="openStockModal('${i.id}')" class="secondary-btn rounded-lg px-2.5 py-1.5 text-xs">ปรับสต๊อก</button><button onclick="openItemModal('${i.id}')" class="ml-2 rounded-lg p-1.5 muted hover:bg-white/10" style="background:none;border:0" aria-label="แก้ไข ${escapeHTML(i.name)}"><i data-lucide="pencil" class="h-4 w-4"></i></button>`:`<button onclick="openRequestModal('${i.id}')" class="secondary-btn rounded-lg px-2.5 py-1.5 text-xs" ${i.qty===0?"disabled":""}>ขอเบิก</button>`}</td></tr>`;
+ }).join("");
+ document.getElementById("inventoryEmpty").classList.toggle("hidden",items.length>0);
+}
+function renderRequests(){
+ const user=state.lastRequester.trim().toLowerCase();
+ const list=(role==="hr"?state.requests:state.requests.filter(r=>user&&r.requester.toLowerCase()===user)).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+ document.getElementById("requestsTableBody").innerHTML=list.map(r=>{
+  const item=itemById(r.itemId);
+  return `<tr><td class="p-4 muted whitespace-nowrap">${formatDate(r.createdAt)}</td><td class="p-4 font-medium">${escapeHTML(r.requester)}</td><td class="p-4">${escapeHTML(item?.name||r.itemName)}</td><td class="p-4">${r.qty} ${escapeHTML(item?.unit||"")}</td><td class="p-4 max-w-48"><p class="truncate muted" title="${escapeHTML(r.reason)}">${escapeHTML(r.reason)}</p></td><td class="p-4">${statusHTML(r.status)}</td><td class="p-4 text-right">${role==="hr"&&r.status==="pending"?`<button onclick="decideRequest('${r.id}',true)" class="primary-btn rounded-lg px-2.5 py-1.5 text-xs">อนุมัติ</button><button onclick="decideRequest('${r.id}',false)" class="ml-2 danger-btn rounded-lg px-2.5 py-1.5 text-xs">ไม่อนุมัติ</button>`:`<span class="muted text-xs">${r.status==="pending"?"กำลังรอ HR":r.decidedAt?formatDate(r.decidedAt):"—"}</span>`}</td></tr>`;
+ }).join("");
+ document.getElementById("requestsEmpty").classList.toggle("hidden",list.length>0);
+}
+function updatePendingBadge(){const n=state.requests.filter(r=>r.status==="pending").length,b=document.getElementById("pendingBadge");b.textContent=n;b.classList.toggle("hidden",n===0);}
+
+function switchView(view){
+ document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===view+"View"));
+ document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function openModal(kicker,title,content){
+ document.getElementById("modalKicker").textContent=kicker;document.getElementById("modalTitle").textContent=title;document.getElementById("modalContent").innerHTML=content;
+ document.getElementById("modalRoot").classList.remove("modal-hidden");
+ setTimeout(()=>document.querySelector("#modalContent input, #modalContent select, #modalContent button")?.focus(),20);lucide.createIcons();
+}
+function closeModal(){document.getElementById("modalRoot").classList.add("modal-hidden");}
+function bindCancel(){document.querySelectorAll(".modalCancel").forEach(b=>b.addEventListener("click",closeModal));}
+
+function openRequestModal(itemId=""){
+ const form=document.getElementById("requestFormTemplate").content.cloneNode(true),temp=document.createElement("div");temp.appendChild(form);
+ openModal("เบิกอุปกรณ์","ส่งคำขอเบิก",temp.innerHTML);
+ const available=state.items.filter(i=>i.qty>0);
+ document.getElementById("requestItem").innerHTML=`<option value="">เลือกอุปกรณ์</option>${available.map(i=>`<option value="${i.id}" ${i.id===itemId?"selected":""}>${escapeHTML(i.name)} (เหลือ ${i.qty} ${escapeHTML(i.unit)})</option>`).join("")}`;
+ document.getElementById("requesterName").value=state.lastRequester;
+ document.getElementById("requestForm").addEventListener("submit",submitRequest);
+ bindCancel();
+}
+function submitRequest(e){
+ e.preventDefault();
+ const name=document.getElementById("requesterName").value.trim(),id=document.getElementById("requestItem").value,qty=Number(document.getElementById("requestQty").value),reason=document.getElementById("requestReason").value.trim(),item=itemById(id);
+ ["requesterName","requestItem","requestQty","requestReason"].forEach(x=>document.getElementById(x+"Error").textContent="");
+ let valid=true;
+ if(!name){document.getElementById("requesterNameError").textContent="กรุณาระบุชื่อผู้เบิก";valid=false;}
+ if(!item){document.getElementById("requestItemError").textContent="กรุณาเลือกอุปกรณ์";valid=false;}
+ if(!Number.isInteger(qty)||qty<1||(item&&qty>item.qty)){document.getElementById("requestQtyError").textContent=item&&qty>item.qty?`จำนวนต้องไม่เกิน ${item.qty} ${item.unit}`:"กรุณาระบุจำนวนอย่างน้อย 1";valid=false;}
+ if(!reason){document.getElementById("requestReasonError").textContent="กรุณาระบุเหตุผลในการเบิก";valid=false;}
+ if(!valid)return;
+ state.lastRequester=name;
+ state.requests.push({id:uid("r"),requester:name,itemId:id,itemName:item.name,qty,reason,status:"pending",createdAt:new Date().toISOString()});
+ closeModal();saveAndRender("ส่งคำขอเบิกเรียบร้อยแล้ว");
+}
+function decideRequest(id,approved){
+ const req=state.requests.find(r=>r.id===id);if(!req||req.status!=="pending")return;
+ const item=itemById(req.itemId);
+ if(approved&&(!item||item.qty<req.qty)){showToast("ไม่สามารถอนุมัติได้ เนื่องจากสต๊อกคงเหลือไม่เพียงพอ","error");return;}
+ req.status=approved?"approved":"rejected";req.decidedAt=new Date().toISOString();if(approved)item.qty-=req.qty;
+ saveAndRender(approved?"อนุมัติคำขอและตัดสต๊อกแล้ว":"บันทึกการไม่อนุมัติแล้ว",approved?"success":"warning");
+}
+function openItemModal(id=""){
+ editingItemId=id;
+ const item=id?itemById(id):{name:"",category:"เครื่องเขียน",qty:"",unit:"ชิ้น",min:1,icon:"📦"};
+ if(id&&!item){showToast("ไม่พบรายการอุปกรณ์ที่ต้องการแก้ไข","error");return;}
+ openModal(id?"แก้ไขรายการ":"เพิ่มเข้าคลัง",id?"แก้ไขอุปกรณ์":"เพิ่มอุปกรณ์ใหม่",`<form id="itemForm" novalidate><div class="grid gap-4 sm:grid-cols-2"><div class="sm:col-span-2"><label for="itemName" class="mb-1.5 block text-sm font-medium">ชื่ออุปกรณ์</label><input id="itemName" class="field" value="${escapeHTML(item.name)}" maxlength="80"><span id="itemNameError" class="error-text"></span></div><div><label for="itemCategory" class="mb-1.5 block text-sm font-medium">หมวดหมู่</label><input id="itemCategory" class="field" value="${escapeHTML(item.category)}" maxlength="50"></div><div><label for="itemUnit" class="mb-1.5 block text-sm font-medium">หน่วยนับ</label><input id="itemUnit" class="field" value="${escapeHTML(item.unit)}" maxlength="20"></div><div><label for="itemQty" class="mb-1.5 block text-sm font-medium">จำนวนคงเหลือ</label><input id="itemQty" class="field" type="number" min="0" value="${item.qty}"></div><div><label for="itemMin" class="mb-1.5 block text-sm font-medium">จำนวนขั้นต่ำ</label><input id="itemMin" class="field" type="number" min="0" value="${item.min}"></div><div><label for="itemIcon" class="mb-1.5 block text-sm font-medium">สัญลักษณ์</label><input id="itemIcon" class="field" value="${escapeHTML(item.icon)}" maxlength="4"></div></div><div class="mt-6 flex justify-end gap-3"><button type="button" class="modalCancel secondary-btn rounded-xl px-4 py-2.5 text-sm">ยกเลิก</button><button type="submit" class="primary-btn rounded-xl px-4 py-2.5 text-sm">บันทึกรายการ</button></div></form>`);
+ document.getElementById("itemForm").addEventListener("submit",submitItem);bindCancel();
+}
+function submitItem(e){
+ e.preventDefault();
+ const form=document.getElementById("itemForm"),submit=form.querySelector('button[type="submit"]'),name=document.getElementById("itemName").value.trim();
+ if(role!=="hr"){showToast("เฉพาะ HR เท่านั้นที่เพิ่มหรือแก้ไขอุปกรณ์ได้","error");return;}
+ const qtyRaw=document.getElementById("itemQty").value.trim(),minRaw=document.getElementById("itemMin").value.trim(),qty=Number(qtyRaw),min=Number(minRaw);
+ const nameError=document.getElementById("itemNameError");nameError.textContent="";
+ if(!name){nameError.textContent="กรุณาระบุชื่ออุปกรณ์";return;}
+ if(qtyRaw===""||!Number.isInteger(qty)||qty<0){showToast("จำนวนเริ่มต้นต้องเป็นจำนวนเต็มตั้งแต่ 0 ขึ้นไป","error");return;}
+ if(minRaw===""||!Number.isInteger(min)||min<1){showToast("จำนวนขั้นต่ำต้องเป็นจำนวนเต็มอย่างน้อย 1","error");return;}
+ if(submit.disabled)return;
+ const existing=editingItemId?itemById(editingItemId):null;
+ if(editingItemId&&!existing){showToast("ไม่พบรายการอุปกรณ์ รายการอาจถูกลบแล้ว","error");return;}
+ const data={id:existing?.id||uid("i"),name,category:document.getElementById("itemCategory").value.trim()||"อื่น ๆ",unit:document.getElementById("itemUnit").value.trim()||"ชิ้น",qty,min,icon:document.getElementById("itemIcon").value.trim()||"📦"};
+ submit.disabled=true;submit.textContent="กำลังบันทึก...";
+ if(existing)Object.assign(existing,data);else state.items.push(data);
+ persist();closeModal();renderAll();
+ showToast(existing?"บันทึกการแก้ไขรายการสำเร็จ":"เพิ่มอุปกรณ์สำเร็จ");
+}
+function openStockModal(id){
+ const item=itemById(id);if(!item){showToast("ไม่พบรายการอุปกรณ์ที่ต้องการปรับสต๊อก","error");return;}
+ openModal("จัดการสต๊อก",item.name,`<form id="stockForm"><p class="mb-4 text-sm muted">คงเหลือปัจจุบัน <b id="stockCurrent" class="gold-text">${item.qty} ${escapeHTML(item.unit)}</b></p><label for="stockAction" class="mb-1.5 block text-sm font-medium">ประเภทการปรับ</label><select id="stockAction" class="field"><option value="receive">เพิ่มจำนวน</option><option value="decrease">ลดจำนวน</option><option value="adjust">กำหนดจำนวนคงเหลือใหม่</option></select><label for="stockQty" class="mb-1.5 mt-4 block text-sm font-medium">จำนวน</label><input id="stockQty" class="field" type="number" min="0" step="1" placeholder="ระบุจำนวน"><p class="mt-2 text-sm muted">หลังปรับ: <b id="stockPreview" class="gold-text">${item.qty} ${escapeHTML(item.unit)}</b></p><span id="stockError" class="error-text"></span><div class="mt-6 flex justify-end gap-3"><button type="button" class="modalCancel secondary-btn rounded-xl px-4 py-2.5 text-sm">ยกเลิก</button><button type="submit" class="primary-btn rounded-xl px-4 py-2.5 text-sm">บันทึกการปรับจำนวน</button></div></form>`);
+ const calc=(cur,action,q)=>action==="receive"?cur.qty+q:action==="decrease"?cur.qty-q:q;
+ const updatePreview=()=>{const cur=itemById(id),raw=document.getElementById("stockQty").value,q=Number(raw),action=document.getElementById("stockAction").value;let next=cur?cur.qty:0;if(cur&&raw!==""&&Number.isInteger(q)&&q>=0)next=calc(cur,action,q);document.getElementById("stockPreview").textContent=`${next} ${cur?.unit||""}`;};
+ document.getElementById("stockQty").addEventListener("input",updatePreview);
+ document.getElementById("stockAction").addEventListener("change",updatePreview);
+ document.getElementById("stockForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const cur=itemById(id),raw=document.getElementById("stockQty").value,q=Number(raw),action=document.getElementById("stockAction").value,err=document.getElementById("stockError");
+  if(!cur){err.textContent="ไม่พบรายการ อาจถูกลบแล้ว";return;}
+  if(raw===""||!Number.isInteger(q)||q<0){err.textContent="กรุณาระบุจำนวนเป็นจำนวนเต็ม 0 หรือมากกว่า";return;}
+  const next=calc(cur,action,q);
+  if(next<0){err.textContent="จำนวนคงเหลือหลังปรับต้องไม่ติดลบ";return;}
+  cur.qty=next;persist();closeModal();renderAll();showToast("บันทึกการปรับจำนวนสำเร็จ");
+ });
+ bindCancel();
+}
+const HR_CRED_HASH="dd48a0460bf595cce4ba7bf902b9873ab80745b24431b7da4a9e2f6f2f011557";
+async function sha256Hex(text){
+ const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(text));
+ return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function requestHR(){
+ openModal("ยืนยันตัวตน","เข้าสู่โหมด HR",`<form id="hrLoginForm" novalidate><p class="mb-4 text-sm muted">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อจัดการคลัง</p><label for="hrUser" class="mb-1.5 block text-sm font-medium">Username</label><input id="hrUser" class="field" type="text" autocomplete="username" autocapitalize="off" spellcheck="false"><label for="hrPass" class="mb-1.5 mt-4 block text-sm font-medium">Password</label><input id="hrPass" class="field" type="password" autocomplete="current-password"><span id="hrLoginError" class="error-text"></span><div class="mt-6 flex justify-end gap-3"><button type="button" class="modalCancel secondary-btn rounded-xl px-4 py-2.5 text-sm">ยกเลิก</button><button type="submit" class="primary-btn rounded-xl px-4 py-2.5 text-sm">เข้าสู่ HR</button></div></form>`);
+ document.getElementById("hrLoginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const btn=e.target.querySelector('button[type="submit"]');
+  if(btn.disabled)return;
+  const u=document.getElementById("hrUser").value.trim(),pw=document.getElementById("hrPass").value;
+  btn.disabled=true;
+  let ok=false;
+  try{ok=(await sha256Hex("ddg-inventory|"+u+"|"+pw))===HR_CRED_HASH;}catch{}
+  btn.disabled=false;
+  if(ok){role="hr";closeModal();saveAndRender("เข้าสู่โหมด HR แล้ว");}
+  else{document.getElementById("hrLoginError").textContent="Username หรือ Password ไม่ถูกต้อง กรุณาลองอีกครั้ง";document.getElementById("hrPass").value="";document.getElementById("hrPass").focus();}
+ });
+ bindCancel();
+}
+
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>switchView(b.dataset.view)));
+document.getElementById("requestFromDashboard").addEventListener("click",()=>openRequestModal());
+document.getElementById("requestFromRequests").addEventListener("click",()=>openRequestModal());
+document.getElementById("addItemBtn").addEventListener("click",()=>openItemModal());
+["employeeRoleBtn","employeeRoleBtnM"].forEach(id=>document.getElementById(id).addEventListener("click",()=>{role="employee";renderAll();}));
+["hrRoleBtn","hrRoleBtnM"].forEach(id=>document.getElementById(id).addEventListener("click",requestHR));
+document.getElementById("closeModalBtn").addEventListener("click",closeModal);
+document.getElementById("modalRoot").addEventListener("click",e=>{if(e.target.id==="modalRoot")closeModal();});
+document.getElementById("searchInput").addEventListener("input",renderInventory);
+document.getElementById("categoryFilter").addEventListener("change",renderInventory);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("modalRoot").classList.contains("modal-hidden"))closeModal();});
+
+const STATUS_TH={pending:"รออนุมัติ",approved:"อนุมัติแล้ว",rejected:"ไม่อนุมัติ",ready:"พร้อมใช้",low:"ใกล้หมด",out:"หมด"};
+function buildDatasets(){
+ const summary=[["อุปกรณ์","หมวดหมู่","เบิกแล้ว (อนุมัติ)","รออนุมัติ","ไม่อนุมัติ","คงเหลือ","หน่วย","สถานะ"],...state.items.map(i=>{const rs=state.requests.filter(r=>r.itemId===i.id),sum=st=>rs.filter(r=>r.status===st).reduce((a,r)=>a+r.qty,0);return[i.name,i.category,sum("approved"),sum("pending"),sum("rejected"),i.qty,i.unit,STATUS_TH[itemStatus(i)]];})];
+ const stock=[["อุปกรณ์","หมวดหมู่","คงเหลือ","หน่วย","จำนวนขั้นต่ำ","สถานะ"],...state.items.map(i=>[i.name,i.category,i.qty,i.unit,i.min,STATUS_TH[itemStatus(i)]])];
+ const reqs=[["วันที่ขอ","ผู้เบิก","อุปกรณ์","จำนวน","หน่วย","เหตุผล","สถานะ","วันที่ดำเนินการ"],...[...state.requests].sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).map(r=>{const it=itemById(r.itemId);return[formatDate(r.createdAt),r.requester,it?.name||r.itemName,r.qty,it?.unit||"",r.reason,STATUS_TH[r.status],r.decidedAt?formatDate(r.decidedAt):""];})];
+ return {all:null,summary:{title:"สรุปการเบิก",rows:summary},stock:{title:"คงเหลือ",rows:stock},reqs:{title:"รายการเบิก",rows:reqs}};
+}
+function toTSV(rows){return rows.map(r=>r.map(c=>String(c??"").replace(/[\t\r\n]+/g," ")).join("\t")).join("\n");}
+function datasetText(key){
+ const d=buildDatasets();
+ if(key==="all")return ["summary","stock","reqs"].map(k=>d[k].title+"\n"+toTSV(d[k].rows)).join("\n\n");
+ return toTSV(d[key].rows);
+}
+function openSheetsModal(){
+ if(role!=="hr"){showToast("เฉพาะ HR เท่านั้นที่ส่งออกข้อมูลได้","error");return;}
+ openModal("ส่งออกข้อมูล","ส่งออกไป Google Sheets",`<div><p class="mb-4 text-sm muted">เลือกข้อมูล กดคัดลอก แล้วเปิด Google Sheets ใหม่ จากนั้นวาง (Ctrl+V / ⌘V) ที่ช่อง A1 ข้อมูลจะแยกคอลัมน์ให้อัตโนมัติ</p><label for="sheetDataset" class="mb-1.5 block text-sm font-medium">ข้อมูลที่ต้องการ</label><select id="sheetDataset" class="field"><option value="summary">สรุปการเบิก + คงเหลือ (ต่ออุปกรณ์)</option><option value="reqs">รายการคำขอเบิกทั้งหมด</option><option value="stock">ยอดคงเหลือ</option><option value="all">ทั้งหมด (ทุกตารางต่อกัน)</option></select><label for="sheetPreview" class="mb-1.5 mt-4 block text-sm font-medium">ตัวอย่างข้อมูล</label><textarea id="sheetPreview" class="field text-xs" rows="7" readonly style="white-space:pre;font-family:ui-monospace,monospace"></textarea><span id="sheetMsg" class="error-text" style="color:#b9ebb9"></span><div class="mt-5 flex flex-wrap justify-end gap-3"><button type="button" class="modalCancel secondary-btn rounded-xl px-4 py-2.5 text-sm">ปิด</button><button type="button" id="sheetCopy" class="secondary-btn rounded-xl px-4 py-2.5 text-sm">คัดลอกข้อมูล</button><a id="sheetOpen" href="https://sheets.new" target="_blank" rel="noopener noreferrer" class="primary-btn inline-flex items-center rounded-xl px-4 py-2.5 text-sm">เปิด Google Sheets ใหม่</a></div></div>`);
+ const sel=document.getElementById("sheetDataset"),prev=document.getElementById("sheetPreview"),msg=document.getElementById("sheetMsg");
+ const refresh=()=>{prev.value=datasetText(sel.value);msg.textContent="";};
+ sel.addEventListener("change",refresh);refresh();
+ document.getElementById("sheetCopy").addEventListener("click",async()=>{
+  const text=datasetText(sel.value);
+  try{await navigator.clipboard.writeText(text);msg.style.color="#b9ebb9";msg.textContent="คัดลอกแล้ว — ไปวางใน Google Sheets ได้เลย";}
+  catch{prev.focus();prev.select();try{document.execCommand("copy");msg.style.color="#b9ebb9";msg.textContent="คัดลอกแล้ว — ไปวางใน Google Sheets ได้เลย";}catch{msg.style.color="#ffabab";msg.textContent="คัดลอกอัตโนมัติไม่ได้ กรุณาคัดลอกข้อความในกล่องด้วยตนเอง (Ctrl+A, Ctrl+C)";}}
+ });
+ bindCancel();
+}
+document.querySelectorAll(".exportBtn").forEach(b=>b.addEventListener("click",openSheetsModal));
+window.openRequestModal=openRequestModal;window.openItemModal=openItemModal;window.openStockModal=openStockModal;window.decideRequest=decideRequest;
+renderAll();
+</script>
+</body></html>
